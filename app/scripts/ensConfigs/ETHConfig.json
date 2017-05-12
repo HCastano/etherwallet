@@ -6,3 +6,22 @@
     },
     "registry": "0x314159265dD8dbb310642f98f50C066173C1259b"
 }
+
+// highly recommend we follow more closely to ensutils.js
+// https://raw.githubusercontent.com/ethereum/ens/master/ensutils.js
+
+
+// (MEW)          registry = '0x314159265dD8dbb310642f98f50C066173C1259b'
+// (ENSUTILS) var ens = ensContract.at('0x314159265dd8dbb310642f98f50c066173c1259b');
+
+
+// (MEW)          public.ethAuction = '0x6090a6e47849629b7245dfa1ca21d94cd15878ef'
+// (ENSUTILS) var ethRegistrar = auctionRegistrarContract.at(ens.owner(namehash('eth')));
+
+
+// (MEW)          public.resolver = '0x0000000000000000000000000000000000000000'
+// (ENSUTILS) var publicResolver = resolverContract.at('0x1da022710df5002339274aadee8d58218e9d6ab5');
+
+
+// (MEW)          public.reverse = '0xdA7fA6E0b04c76683F54c973931862D7fE474a85'
+// (ENSUTILS) var reverseRegistrar = reverseRegistrarContract.at(ens.owner(namehash('addr.reverse')));
