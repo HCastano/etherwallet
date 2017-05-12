@@ -25,7 +25,6 @@ var walletBalanceCtrl = function($scope, $sce) {
             }
         });
     }
-    /*
     $scope.$watch('wallet', function() {
         if ($scope.wallet) $scope.reverseLookup();
     });
@@ -34,14 +33,13 @@ var walletBalanceCtrl = function($scope, $sce) {
         _ens.getName($scope.wallet.getAddressString().substring(2) + '.addr.reverse', function(data) {
             if (data.error) uiFuncs.notifier.danger(data.msg);
             else if (data.data == '0x') {
-                $scope.showens = false;
+                $scope.showens = true;
             } else {
                 $scope.ensAddress = data.data;
                 $scope.showens = true;
             }
         });
     }
-    */
     $scope.removeTokenFromLocal = function(tokenSymbol) {
         globalFuncs.removeTokenFromLocal(tokenSymbol, $scope.wallet.tokenObjs);
     }
