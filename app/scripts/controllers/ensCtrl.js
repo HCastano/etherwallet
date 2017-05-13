@@ -11,16 +11,19 @@ var ensCtrl = function($scope, $sce, walletService) {
     $scope.ensModes = ens.modes;
     $scope.minNameLength = 7;
     $scope.objENS = {
-        status: -1,
-        name: '',
-        timeRemaining: null,
-        timer: null,
         bidValue: 0.01,
         dValue: 0.01,
-        secret: hd.bip39.generateMnemonic().split(" ").splice(0, 3).join(" "),
+        name: '',
+        namehash: '',
         nameReadOnly: false,
-        txSent: false,
-        revealObject: null
+        resolvedAddress: null,
+        revealObject: null,
+        secret: hd.bip39.generateMnemonic().split(" ").splice(0, 3).join(" "),
+        status: -1,
+        timer: null,
+        timeRemaining: null,
+        timeRemainingReveal: null,
+        txSent: false
     };
     $scope.tx = {
         gasLimit: '500000',
@@ -74,6 +77,7 @@ var ensCtrl = function($scope, $sce, walletService) {
     $scope.checkName = function() {
         if ($scope.Validator.isValidENSName($scope.objENS.name)) {
             $scope.objENS.name = ens.normalise($scope.objENS.name);
+            $scope.objENS.namehash = ENS.getSHA3( ens.normalise($scope.objENS.name+'.eth') );
             $scope.hideEnsInfoPanel = true;
             ENS.getAuctionEntries($scope.objENS.name, function(data) {
                 if (data.error) $scope.notifier.danger(data.msg);
@@ -87,6 +91,9 @@ var ensCtrl = function($scope, $sce, walletService) {
                             })
                             ENS.getDeedOwner($scope.objENS.deed, function(data) {
                                 $scope.objENS.deedOwner = data.data;
+                            })
+                            ENS.getAddress($scope.objENS.name, function(data) {
+                                $scope.objENS.resolvedAddress = data.data;
                             })
                             break;
                         case $scope.ensModes.notAvailable:
@@ -173,7 +180,7 @@ var ensCtrl = function($scope, $sce, walletService) {
           if ($scope.wallet.getAddressString() != $scope.objENS.deedOwner) {
               $scope.notifier.danger(globalFuncs.errorMsgs[33]);
               return;
-          } 
+          }
         var _objENS = $scope.objENS;
         ajaxReq.getTransactionData($scope.wallet.getAddressString(), function(data) {
             if (data.error) $scope.notifier.danger(data.msg);
@@ -203,7 +210,7 @@ var ensCtrl = function($scope, $sce, walletService) {
         var _objENS = $scope.objENS;
         $scope.bidObject = {
             name: _objENS.name,
-            nameSHA3: ENS.getSHA3(_objENS.name),
+            nameSHA3: ENS.getSHA3(_objENS.name), //should be able to do _objENS.namehash
             owner: $scope.wallet.getAddressString(),
             value: etherUnits.toWei(_objENS.bidValue, 'ether'),
             secret: _objENS.secret.trim(),
@@ -233,7 +240,6 @@ var ensCtrl = function($scope, $sce, walletService) {
                 });
             }
         });
-
     }
     $scope.sendTxStatus = "";
     $scope.sendTx = function() {

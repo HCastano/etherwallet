@@ -54,6 +54,9 @@ ens.prototype.setCurrentRegistry = function(_registry) {
 ens.prototype.getRegistryAddress = function() {
     return this.curRegistry.registry;
 }
+ens.prototype.getPublicResolverAddress = function() {
+    return this.curRegistry.publicResolver;
+}
 
 function namehash(name) {
     name = ens.normalise(name);
@@ -93,12 +96,14 @@ ens.prototype.getOwnerResolverAddress = function(funcABI, to, name, callback) {
 ens.prototype.getDeedOwner = function(to, callback) {
     this.getOwnerResolverAddress(this.deedABI.owner, to, '', callback);
 }
+
 ens.prototype.getOwner = function(name, callback) {
     this.getOwnerResolverAddress(this.registryABI.owner, this.getRegistryAddress(), name, callback);
 }
 ens.prototype.getResolver = function(name, callback) {
     this.getOwnerResolverAddress(this.registryABI.resolver, this.getRegistryAddress(), name, callback);
 }
+
 ens.prototype.getAddress = function(name, callback) {
     var _this = this;
     _this.getResolver(name, function(data) {
@@ -145,7 +150,7 @@ ens.prototype.resolveAddressByName = function(name, callback) {
     });
 }
 ens.prototype.getAuctionAddress = function() {
-    return this.curRegistry.public.ethAuction;
+    return this.curRegistry.ethRegistrar;
 }
 ens.prototype.getStartAuctionData = function(name) {
     var _this = this;
@@ -181,7 +186,7 @@ ens.prototype.getAuctionEntries = function(name, callback) {
     var _this = this;
     name = _this.getSHA3(ens.normalise(name));
     var funcABI = _this.auctionABI.entries;
-    ajaxReq.getEthCall({ to: _this.curRegistry.public.ethAuction, data: _this.getDataString(funcABI, [name]) }, function(data) {
+    ajaxReq.getEthCall({ to: _this.curRegistry.ethRegistrar, data: _this.getDataString(funcABI, [name]) }, function(data) {
         if (data.error) callback(data);
         else {
             var outTypes = funcABI.outputs.map(function(i) {
@@ -202,7 +207,7 @@ ens.prototype.getAuctionEntries = function(name, callback) {
 ens.prototype.shaBid = function(hash, owner, value, saltHash, callback) {
     var _this = this;
     var funcABI = _this.auctionABI.shaBid;
-    ajaxReq.getEthCall({ to: _this.curRegistry.public.ethAuction, data: _this.getDataString(funcABI, [hash, owner, value, saltHash]) }, function(data) {
+    ajaxReq.getEthCall({ to: _this.curRegistry.ethRegistrar, data: _this.getDataString(funcABI, [hash, owner, value, saltHash]) }, function(data) {
         if (data.error) callback(data);
         else {
             var outTypes = funcABI.outputs.map(function(i) {
@@ -217,7 +222,7 @@ ens.prototype.getAllowedTime = function(name, callback) {
     var _this = this;
     var funcABI = _this.auctionABI.getAllowedTime;
     name = _this.getSHA3(ens.normalise(name));
-    ajaxReq.getEthCall({ to: _this.curRegistry.public.ethAuction, data: _this.getDataString(funcABI, [name]) }, function(data) {
+    ajaxReq.getEthCall({ to: _this.curRegistry.ethRegistrar, data: _this.getDataString(funcABI, [name]) }, function(data) {
         if (data.error) callback(data);
         else {
             var outTypes = funcABI.outputs.map(function(i) {
