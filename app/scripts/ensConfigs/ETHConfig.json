@@ -2,7 +2,7 @@
     "publicResolver":   "0x1da022710df5002339274aadee8d58218e9d6ab5",
     "reverseRegistrar": "0xdA7fA6E0b04c76683F54c973931862D7fE474a85",
     "ethRegistrar":     "0x6090a6e47849629b7245dfa1ca21d94cd15878ef",
-    "registry":          "0x314159265dD8dbb310642f98f50C066173C1259b" //ensContract
+    "registry":         "0x314159265dD8dbb310642f98f50C066173C1259b" //ensContract
 }
 
 // highly recommend we follow more closely to ensutils.js

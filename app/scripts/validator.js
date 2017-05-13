@@ -19,7 +19,7 @@ validator.isValidENSName = function(str) {
 validator.isValidENSAddress = function(address) {
     address = ens.normalise(address);
     var _ens = new ens();
-    if (_ens.curRegistry.public.resolver) return true;
+    if (_ens.curRegistry.publicResolver) return true;
     return false;
 }
 validator.isValidBTCAddress = function(address) {

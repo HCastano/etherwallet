@@ -84,7 +84,7 @@ var ensCtrl = function($scope, $sce, walletService) {
     $scope.checkName = function() {
         if ($scope.Validator.isValidENSName($scope.objENS.name)) {
             $scope.objENS.name = ens.normalise($scope.objENS.name);
-            $scope.objENS.namehash = ENS.getSHA3( ens.normalise($scope.objENS.name+'.eth') );
+            $scope.objENS.namehash = ens.getNameHash($scope.objENS.name+'.eth');
             $scope.hideEnsInfoPanel = true;
             ENS.getAuctionEntries($scope.objENS.name, function(data) {
                 if (data.error) $scope.notifier.danger(data.msg);
@@ -99,7 +99,7 @@ var ensCtrl = function($scope, $sce, walletService) {
                             ENS.getDeedOwner($scope.objENS.deed, function(data) {
                                 $scope.objENS.deedOwner = data.data;
                             })
-                            ENS.getAddress($scope.objENS.name, function(data) {
+                            ENS.getAddress($scope.objENS.name + '.eth', function(data) {
                                 $scope.objENS.resolvedAddress = data.data;
                             })
                             break;
