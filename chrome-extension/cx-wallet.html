@@ -825,14 +825,8 @@
   </div>
 
   <div class="row form-group">
-    <div class="col-xs-10">
-      <label translate="SEND_addr"> To Address: </label>
-      <input class="form-control"  type="text" placeholder="0x7cB57B5A97eAbe94205C07890BE4c1aD31E486A8" ng-model="tx.to" ng-class="Validator.isValidAddress(tx.to) ? 'is-valid' : 'is-invalid'"/>
-    </div>
-    <div class="col-xs-2 address-identicon-container">
-      <div class="addressIdenticon" title="Address Indenticon" blockie-address="{{tx.to}}" watch-var="tx.to"></div>
-    </div>
-    </div>
+    <address-field var-name="tx.to" read-only='tx.readOnly' placeholder='0x7cB57B5A97eAbe94205C07890BE4c1aD31E486A8'></address-field>
+  </div>
   <!-- / To Address -->
 
   <!-- Amount to Send -->
@@ -1232,14 +1226,8 @@
   </div>
 
   <div class="row form-group">
-    <div class="col-xs-10">
-      <label translate="SEND_addr"> To Address: </label>
-      <input class="form-control"  type="text" placeholder="0x7cB57B5A97eAbe94205C07890BE4c1aD31E486A8" ng-model="tx.to" ng-class="Validator.isValidAddress(tx.to) ? 'is-valid' : 'is-invalid'"/>
-    </div>
-    <div class="col-xs-2 address-identicon-container">
-      <div class="addressIdenticon" title="Address Indenticon" blockie-address="{{tx.to}}" watch-var="tx.to"></div>
-    </div>
-    </div>
+    <address-field var-name="tx.to" read-only='tx.readOnly' placeholder='0x7cB57B5A97eAbe94205C07890BE4c1aD31E486A8'></address-field>
+  </div>
   <!-- / To Address -->
 
   <!-- Amount to Send -->
@@ -2256,7 +2244,10 @@
       <h5>Bid Amount</h5>
       <p ng-show="objENS.status!=ensModes.reveal"><em><small>You must remember this to claim your name later.</small></em></p>
       <div class="input-group">
-        <input class="form-control" type="number" placeholder="1 {{ajaxReq.type}}" ng-model="objENS.bidValue" ng-class="Validator.isPositiveNumber(objENS.bidValue) && objENS.bidValue >= 0.01 && objENS.bidValue < wallet.balance ? 'is-valid' : 'is-invalid'"/>
+        <!-- validate wallet balance for everything but reveal -->
+        <input ng-show="objENS.status!=ensModes.reveal" class="form-control" type="number" placeholder="1 {{ajaxReq.type}}" ng-model="objENS.bidValue" ng-class="Validator.isPositiveNumber(objENS.bidValue) && objENS.bidValue >= 0.01 && objENS.bidValue < wallet.balance ? 'is-valid' : 'is-invalid'"/>
+        <!-- don't check wallet balance for reveal -->
+        <input ng-show="objENS.status==ensModes.reveal" class="form-control" type="number" placeholder="1 {{ajaxReq.type}}" ng-model="objENS.bidValue" ng-class="Validator.isPositiveNumber(objENS.bidValue) && objENS.bidValue >= 0.01 ? 'is-valid' : 'is-invalid'"/>
         <div class="input-group-btn"><a class="btn btn-default">{{ajaxReq.type}}</a></div>
       </div>
       <!-- / Bid Amount -->
@@ -2431,7 +2422,6 @@
   <p>2. Call <code>setAddr</code> on Public Resolver: <code>0x1da022710df5002339274aadee8d58218e9d6ab5</code> </p>
 
   <p><code> setAddr( namehash , {{newResolvedAddress}} ) </code></p>
-
 
 
   <button class="btn btn-primary" ng-click="resolveDomain()"> Resolve {{objENS.name}}.eth </button>

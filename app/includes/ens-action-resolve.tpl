@@ -41,7 +41,6 @@
   <p><code> setAddr( namehash , {{newResolvedAddress}} ) </code></p>
 
 
-
   <button class="btn btn-primary" ng-click="resolveDomain()"> Resolve {{objENS.name}}.eth </button>
 
 </article>

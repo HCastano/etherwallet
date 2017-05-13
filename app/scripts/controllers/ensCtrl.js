@@ -25,6 +25,12 @@ var ensCtrl = function($scope, $sce, walletService) {
         timeRemainingReveal: null,
         txSent: false
     };
+    $scope.gasLimitDefaults = {
+      startAuction: '70000',
+      newBid:       '500000',
+      reveal:       '90000',
+      finalize:     '70000'
+    }
     $scope.tx = {
         gasLimit: '500000',
         data: '',
@@ -67,6 +73,7 @@ var ensCtrl = function($scope, $sce, walletService) {
         minutes = minutes < 10 ? '0' + minutes : minutes;
         seconds = seconds < 10 ? '0' + seconds : seconds;
         $scope.objENS.timeRemaining = days + ' days ' + hours + ' hours ' + minutes + ' minutes ' + seconds + ' seconds ';
+        $scope.objENS.timeRemainingReveal = (days-2) + ' days ' + hours + ' hours ' + minutes + ' minutes ' + seconds + ' seconds ';
         updateScope();
     }
     $scope.nameOnChange = function() {
@@ -111,6 +118,8 @@ var ensCtrl = function($scope, $sce, walletService) {
                             $scope.objENS.bidValue = 0;
                             $scope.objENS.secret = '';
                             $scope.objENS.highestBid = etherUnits.toEther($scope.objENS.highestBid.toString(), 'wei');
+                            clearInterval($scope.objENS.timer);
+                            $scope.objENS.timer = setInterval(() => timeRem($scope.objENS.registrationDate), 1000);
                             break;
                     }
                     updateScope();
@@ -118,6 +127,7 @@ var ensCtrl = function($scope, $sce, walletService) {
             })
         } else $scope.notifier.danger(globalFuncs.errorMsgs[30]);
     }
+
     $scope.onLongStringChanged = function() {
         try {
             $scope.objENS.revealObject = null;
@@ -125,13 +135,21 @@ var ensCtrl = function($scope, $sce, walletService) {
             $scope.objENS.revealObject = tObj;
             if (tObj.value) $scope.objENS.bidValue = Number(etherUnits.toEther(tObj.value, "wei"));
             if (tObj.secret) $scope.objENS.secret = tObj.secret;
-            if (tObj.name && ens.normalise(tObj.name) != $scope.objENS.name) throw new Error(globalFuncs.errorMsgs[34]);
+            if (tObj.name && ens.normalise(tObj.name) != $scope.objENS.name) { // check if correct name
+              $scope.notifier.danger( globalFuncs.errorMsgs[34] );
+            } else if ( tObj.owner != $scope.wallet.getAddressString() ) { // check owner = bidder
+              $scope.notifier.danger( globalFuncs.errorMsgs[33] );
+            } else { //estimate gas to see if it would not work
+              //$scope.estimateGasLimit();
+            }
             updateScope();
         } catch (e) {
             $scope.notifier.danger(e.message);
         }
     }
+
     $scope.openAndBidAuction = function() {
+        $scope.tx.gasLimit = $scope.gasLimitDefaults.startAuction;
         var _objENS = $scope.objENS;
         _objENS.registrationDate = new Date();
         _objENS.registrationDate.setDate(_objENS.registrationDate.getDate() + 5);
@@ -156,6 +174,7 @@ var ensCtrl = function($scope, $sce, walletService) {
         });
     }
     $scope.revealBid = function() {
+        $scope.tx.gasLimit = $scope.gasLimitDefaults.reveal;
         var _objENS = $scope.objENS;
         ajaxReq.getTransactionData($scope.wallet.getAddressString(), function(data) {
             if (data.error) $scope.notifier.danger(data.msg);
@@ -177,10 +196,11 @@ var ensCtrl = function($scope, $sce, walletService) {
         });
     }
     $scope.finalizeDomain = function() {
-          if ($scope.wallet.getAddressString() != $scope.objENS.deedOwner) {
-              $scope.notifier.danger(globalFuncs.errorMsgs[33]);
-              return;
-          }
+        $scope.tx.gasLimit = $scope.gasLimitDefaults.finalize;
+        if ($scope.wallet.getAddressString() != $scope.objENS.deedOwner) {
+            $scope.notifier.danger(globalFuncs.errorMsgs[33]);
+            return;
+        }
         var _objENS = $scope.objENS;
         ajaxReq.getTransactionData($scope.wallet.getAddressString(), function(data) {
             if (data.error) $scope.notifier.danger(data.msg);
@@ -207,6 +227,7 @@ var ensCtrl = function($scope, $sce, walletService) {
         return new Date();
     }
     $scope.bidAuction = function(nonce, gasPrice) {
+        $scope.tx.gasLimit = $scope.gasLimitDefaults.newBid;
         var _objENS = $scope.objENS;
         $scope.bidObject = {
             name: _objENS.name,
